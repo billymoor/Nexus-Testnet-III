@@ -43,6 +43,24 @@ wget -q https://raw.githubusercontent.com/SKaaalper/Nexus-Testnet-III/main/nexus
   
 ![image](https://github.com/user-attachments/assets/5c184bfa-e426-4bd0-a255-06c36cf2df22)
 
+## If you want to add more nodes
+```
+cd /root/nexus-prover
+screen -dmS nexus3 bash -c "nexus-network start --node-id YOUR_NEW_NODE_ID"
+```
+- Change `nexus3`, `nexus4`, `nexus5`, `etc`., depending on the next available `screen` session number.
+- Replace `YOUR_NEW_NODE_ID` with your actual `Node ID` from the **Nexus dashboard**.
+
+## For Multi-Nodes:
+- Each nexus-network instance (per node ID) may need 1–2 GB RAM.
+- So for 5 nodes:
+  - **CPU**: `4–6 vCores`
+  - **RAM**: `6–10 GB` total
+  - **Disk**: `15–25 GB`
+
+🔔 Note:
+**Avoid using duplicate `screen` session names to prevent conflicts that could stop or disable other running nodes.**
+
 ## Monitor or Manage Nodes:
 
 | Action             | Command                     |
