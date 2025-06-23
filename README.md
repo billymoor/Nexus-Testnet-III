@@ -5,10 +5,10 @@
 ### Testnet III will be live until the Nexus Mainnet launch later in Q3 2025. This means that, unlike past Nexus testnets, participants in every country will have weeks, not days, to contribute to the Nexus supercomputer and earn rewards.
 
 ## Features:
-- Installs all required dependencies
-- Supports 1 to 10 simultaneous nodes
-- Automatically installs Rust, Nexus CLI, and `nexus-network`
-- Launches multiple nodes in `screen` sessions
+- **Installs all required dependencies**
+- **Supports 1 to 10 simultaneous nodes**
+- **Automatically installs Rust, Nexus CLI, and `nexus-network`**
+- **Launches multiple nodes in `screen` sessions**
 
 ## Nexus Prover Node — Recommended Hardware Requirements:
 
