@@ -18,7 +18,7 @@
 | **RAM**          | 2 GB                     | 4–8 GB                       |
 | **Disk Space**   | 10 GB SSD                | 20 GB SSD (NVMe if possible) |
 | **Bandwidth**    | 5 Mbps (up/down)         | 10+ Mbps stable              |
-| **OS**           | Ubuntu 20.04 / 22.04     | Ubuntu 22.04 LTS             |
+| **OS**           | Ubuntu 22.04             | Ubuntu 24.04 LTS             |
 | **Architecture** | x86\_64                  | x86\_64                      |
 | **Other**        | Root access + open ports | VPS or Dedicated Server      |
 
