@@ -16,8 +16,8 @@ fi
 clear
 echo -e "${YELLOW}==================================================${NC}"
 echo -e "${GREEN}=       🚀 Nexus Multi-Node Setup              =${NC}"
-echo -e "${YELLOW}=  Telegram: https://t.me/KatayanAirdropGnC  =${NC}"
-echo -e "${GREEN}=        by: _Jheff | PNGO Boiz!!             =${NC}"
+echo -e "${YELLOW}=               CPI.TM                          =${NC}"
+echo -e "${GREEN}=             by billymoor                          =${NC}"
 echo -e "${YELLOW}==================================================${NC}\n"
 
 # === Working directory ===
