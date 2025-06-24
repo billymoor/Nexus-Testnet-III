@@ -84,17 +84,20 @@ for ((i=0;i<NODE_COUNT;i++)); do
   SESSION_NAME="nexus$((i+1))"
   NODE_ID="${NODE_IDS[$i]}"
   
-  # Створюємо скрипт для запуску вузла в окремій сесії
-  echo "source $HOME/.cargo/env && nexus-network start --node-id $NODE_ID" > "/root/run_${SESSION_NAME}.sh"
-  chmod +x "/root/run_${SESSION_NAME}.sh"
+  # Перевірка наявності screen
+  if ! command -v screen &>/dev/null; then
+    echo -e "${RED}[!] screen is not installed. Please install screen manually.${NC}"
+    exit 1
+  fi
 
-  # Якщо сесія вже є, її потрібно завершити перед запуском нової
+  # Якщо сесія вже є, її потрібно завершити перед запуском нового
   screen -S "$SESSION_NAME" -X quit 2>/dev/null || true
   
+  # Запуск вузла в сесії screen
   echo -e "${GREEN}[*] Launching node-id $NODE_ID in screen session '$SESSION_NAME'...${NC}"
-  screen -dmS "$SESSION_NAME" "/root/run_${SESSION_NAME}.sh"
+  screen -dmS "$SESSION_NAME" bash -c "cd $WORKDIR && nexus-network start --node-id $NODE_ID"
   
-  # Перевіряємо, чи вдалося запустити сесію
+  # Перевірка, чи сесія запустилась
   sleep 1
   if screen -list | grep -q "$SESSION_NAME"; then
     echo -e "${GREEN}[✓] node-id $NODE_ID running in '$SESSION_NAME'${NC}"
