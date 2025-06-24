@@ -75,6 +75,3 @@ screen -dmS nexus3 bash -c "nexus-network start --node-id YOUR_NEW_NODE_ID"
 - **More Info's** at [Official Docs](https://docs.nexus.xyz/layer-1/testnet/testnet-3)
 - **Nexus Official** [Discord](https://discord.gg/zH7rdrt29E)
 - **Nexus Official** [Twitter](https://x.com/NexusLabs)
-
-## Join the Telegram for updates and help:
-👉 [@KatayanAirdropGnC](https://t.me/KatayanAirdropGnC)
