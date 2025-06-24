@@ -58,11 +58,5 @@ docker pull nexusxyz/nexus-cli:latest
 
 # Створюємо сесію screen
 echo "Створюємо сесію screen..."
-screen -S nexus3
-
-# Повідомлення про завершення
 echo "Встановлення завершено! Тепер ви в сесії screen із Nexus CLI."
-
-# Останнє повідомлення
-echo -e "${GREEN}Запускаємо ноду командою нижче, але змінюємо на свій ID:${NC}"
-echo "docker run -it --init --name nexus nexusxyz/nexus-cli:latest start --node-id ВАШ_ID"
+screen -S nexus3
