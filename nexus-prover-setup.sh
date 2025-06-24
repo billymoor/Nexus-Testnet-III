@@ -25,6 +25,18 @@ REQUIRED_GLIBC_VERSION="2.39"
 INSTALL_GLIBC=false
 GLIBC_DIR="/opt/glibc-2.39"
 
+# Check if /opt exists and has write permissions
+if [ ! -d "/opt" ]; then
+  echo -e "${RED}[!] /opt directory doesn't exist. Creating...${NC}"
+  mkdir -p /opt
+  chmod 777 /opt
+fi
+
+if [ ! -w "/opt" ]; then
+  echo -e "${RED}[!] No write permissions to /opt. Setting permissions...${NC}"
+  chmod 777 /opt
+fi
+
 # Check if GLIBC is installed at the correct location
 if [ -f "$GLIBC_DIR/lib/libc.so.6" ]; then
   INSTALLED_VERSION=$($GLIBC_DIR/lib/libc.so.6 | grep GLIBC | awk '{print $NF}' | sort -V | tail -n 1)
@@ -78,7 +90,7 @@ fi
 # === Setup Rust environment ===
 source "$HOME/.cargo/env"
 echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> "$HOME/.bashrc"
-source "$HOME/.bashrc"
+source ~/.bashrc
 
 # === Install Nexus CLI ===
 echo -e "${GREEN}[*] Downloading and installing Nexus CLI...${NC}"
