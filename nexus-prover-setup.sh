@@ -28,7 +28,6 @@ if [[ "$(printf '%s\n' "$REQUIRED_GLIBC_VERSION" "$CURRENT_GLIBC_VERSION" | sort
     echo -e "${RED}[!] Required GLIBC version is $REQUIRED_GLIBC_VERSION. Your version is $CURRENT_GLIBC_VERSION.${NC}"
     echo -e "${YELLOW}[!] Proceeding with updating GLIBC to version $REQUIRED_GLIBC_VERSION.${NC}"
 
-    cd /root || exit 1
     wget http://ftp.gnu.org/gnu/libc/glibc-2.39.tar.gz
     tar -xvzf glibc-2.39.tar.gz
     cd glibc-2.39
@@ -37,11 +36,14 @@ if [[ "$(printf '%s\n' "$REQUIRED_GLIBC_VERSION" "$CURRENT_GLIBC_VERSION" | sort
     make -j$(nproc)
     make install
 
-    echo -e "${GREEN}[✓] GLIBC 2.39 installed to /opt/glibc-2.39${NC}"
-fi
+    export LD_LIBRARY_PATH=/opt/glibc-2.39/lib:$LD_LIBRARY_PATH
+    echo "export LD_LIBRARY_PATH=/opt/glibc-2.39/lib:\$LD_LIBRARY_PATH" >> ~/.bashrc
+    source ~/.bashrc
 
-# === Define LD path ===
-export LD_LIBRARY_PATH=/opt/glibc-2.39/lib:$LD_LIBRARY_PATH
+    echo -e "${GREEN}[✓] GLIBC updated successfully!${NC}"
+else
+    echo -e "${GREEN}[✓] GLIBC version is sufficient (${CURRENT_GLIBC_VERSION}).${NC}"
+fi
 
 # === Working directory ===
 WORKDIR="/root/nexus-prover"
@@ -105,8 +107,7 @@ done
 for ((i=0;i<NODE_COUNT;i++)); do
   SESSION_NAME="nexus$((i+1))"
   NODE_ID="${NODE_IDS[$i]}"
-
-  # Ensure screen exists
+  
   if ! command -v screen &>/dev/null; then
     echo -e "${RED}[!] screen is not installed. Please install screen manually.${NC}"
     exit 1
@@ -132,7 +133,6 @@ echo -e "[i] To reattach: screen -r nexus1 (or nexus2, etc.)"
 echo -e "[i] To stop: screen -XS nexusX quit"
 echo -e "[i] To cleanup: rm -rf $WORKDIR${NC}"
 
-# === Auto-start last entered node for log view ===
-NODE_ID="${NODE_IDS[0]}"
+# === Auto-start Nexus CLI ===
 echo -e "${GREEN}[*] Starting Nexus CLI with node-id $NODE_ID...${NC}"
 LD_LIBRARY_PATH=/opt/glibc-2.39/lib nexus-network start --node-id "$NODE_ID"
