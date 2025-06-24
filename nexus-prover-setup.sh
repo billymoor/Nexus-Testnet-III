@@ -7,7 +7,7 @@ NC='\033[0m' # Без кольору
 
 # Банер
 echo -e "${YELLOW}====================================================${NC}"
-echo -e "${GREEN}=           🚀 Nexus Node Setup                   =${NC}"
+echo -e "${GREEN}=           🚀 Node Pre-Setup                     =${NC}"
 echo -e "${YELLOW}=                CPI.TM                          =${NC}"
 echo -e "${GREEN}=              by billymoor                       =${NC}"
 echo -e "${YELLOW}====================================================${NC}\n"
