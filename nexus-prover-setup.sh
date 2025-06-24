@@ -20,29 +20,37 @@ echo -e "${YELLOW}=               CPI.TM                          =${NC}"
 echo -e "${GREEN}=             by billymoor                       =${NC}"
 echo -e "${YELLOW}==================================================${NC}\n"
 
-# === Check GLIBC version and update if necessary ===
+# === Check GLIBC version and install if missing ===
 REQUIRED_GLIBC_VERSION="2.39"
-CURRENT_GLIBC_VERSION=$(ldd --version | head -n 1 | awk '{print $NF}')
+INSTALL_GLIBC=false
 
-if [[ "$(printf '%s\n' "$REQUIRED_GLIBC_VERSION" "$CURRENT_GLIBC_VERSION" | sort -V | head -n 1)" != "$REQUIRED_GLIBC_VERSION" ]]; then
-    echo -e "${RED}[!] Required GLIBC version is $REQUIRED_GLIBC_VERSION. Your version is $CURRENT_GLIBC_VERSION.${NC}"
-    echo -e "${YELLOW}[!] Proceeding with updating GLIBC to version $REQUIRED_GLIBC_VERSION.${NC}"
-
-    wget http://ftp.gnu.org/gnu/libc/glibc-2.39.tar.gz
-    tar -xvzf glibc-2.39.tar.gz
-    cd glibc-2.39
-    mkdir build && cd build
-    ../configure --prefix=/opt/glibc-2.39
-    make -j$(nproc)
-    make install
-
-    export LD_LIBRARY_PATH=/opt/glibc-2.39/lib:$LD_LIBRARY_PATH
-    echo "export LD_LIBRARY_PATH=/opt/glibc-2.39/lib:\$LD_LIBRARY_PATH" >> ~/.bashrc
-    source ~/.bashrc
-
-    echo -e "${GREEN}[✓] GLIBC updated successfully!${NC}"
+if [ -f "/opt/glibc-2.39/lib/libc.so.6" ]; then
+  INSTALLED_VERSION=$(/opt/glibc-2.39/lib/libc.so.6 | grep GLIBC | awk '{print $NF}' | sort -V | tail -n 1)
+  if [[ "$INSTALLED_VERSION" == "$REQUIRED_GLIBC_VERSION" ]]; then
+    echo -e "${GREEN}[✓] GLIBC $REQUIRED_GLIBC_VERSION already installed in /opt/glibc-2.39${NC}"
+  else
+    INSTALL_GLIBC=true
+  fi
 else
-    echo -e "${GREEN}[✓] GLIBC version is sufficient (${CURRENT_GLIBC_VERSION}).${NC}"
+  INSTALL_GLIBC=true
+fi
+
+if [ "$INSTALL_GLIBC" = true ]; then
+  echo -e "${RED}[!] GLIBC $REQUIRED_GLIBC_VERSION not found. Installing...${NC}"
+  wget http://ftp.gnu.org/gnu/libc/glibc-2.39.tar.gz
+  tar -xvzf glibc-2.39.tar.gz
+  cd glibc-2.39
+  mkdir build && cd build
+  ../configure --prefix=/opt/glibc-2.39
+  make -j$(nproc)
+  make install
+  cd ../.. && rm -rf glibc-2.39*
+
+  export LD_LIBRARY_PATH=/opt/glibc-2.39/lib:$LD_LIBRARY_PATH
+  echo "export LD_LIBRARY_PATH=/opt/glibc-2.39/lib:\$LD_LIBRARY_PATH" >> ~/.bashrc
+  source ~/.bashrc
+
+  echo -e "${GREEN}[✓] GLIBC $REQUIRED_GLIBC_VERSION installed successfully!${NC}"
 fi
 
 # === Working directory ===
@@ -107,7 +115,7 @@ done
 for ((i=0;i<NODE_COUNT;i++)); do
   SESSION_NAME="nexus$((i+1))"
   NODE_ID="${NODE_IDS[$i]}"
-  
+
   if ! command -v screen &>/dev/null; then
     echo -e "${RED}[!] screen is not installed. Please install screen manually.${NC}"
     exit 1
