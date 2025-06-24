@@ -28,25 +28,20 @@ if [[ "$(printf '%s\n' "$REQUIRED_GLIBC_VERSION" "$CURRENT_GLIBC_VERSION" | sort
     echo -e "${RED}[!] Required GLIBC version is $REQUIRED_GLIBC_VERSION. Your version is $CURRENT_GLIBC_VERSION.${NC}"
     echo -e "${YELLOW}[!] Proceeding with updating GLIBC to version $REQUIRED_GLIBC_VERSION.${NC}"
 
-    # Download and compile GLIBC 2.39
+    cd /root || exit 1
     wget http://ftp.gnu.org/gnu/libc/glibc-2.39.tar.gz
     tar -xvzf glibc-2.39.tar.gz
     cd glibc-2.39
-    mkdir build
-    cd build
+    mkdir build && cd build
     ../configure --prefix=/opt/glibc-2.39
     make -j$(nproc)
-    sudo make install
+    make install
 
-    # Update library path
-    export LD_LIBRARY_PATH=/opt/glibc-2.39/lib:$LD_LIBRARY_PATH
-    echo "export LD_LIBRARY_PATH=/opt/glibc-2.39/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
-    source ~/.bashrc
-
-    echo -e "${GREEN}[✓] GLIBC updated successfully!${NC}"
-else
-    echo -e "${GREEN}[✓] GLIBC version is sufficient (${CURRENT_GLIBC_VERSION}).${NC}"
+    echo -e "${GREEN}[✓] GLIBC 2.39 installed to /opt/glibc-2.39${NC}"
 fi
+
+# === Define LD path ===
+export LD_LIBRARY_PATH=/opt/glibc-2.39/lib:$LD_LIBRARY_PATH
 
 # === Working directory ===
 WORKDIR="/root/nexus-prover"
@@ -67,7 +62,7 @@ fi
 # === Setup Rust environment ===
 source "$HOME/.cargo/env"
 echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> "$HOME/.bashrc"
-source "$HOME/.bashrc"  # Оновлюємо PATH
+source "$HOME/.bashrc"
 
 # === Install Nexus CLI ===
 echo -e "${GREEN}[*] Downloading and installing Nexus CLI...${NC}"
@@ -110,21 +105,18 @@ done
 for ((i=0;i<NODE_COUNT;i++)); do
   SESSION_NAME="nexus$((i+1))"
   NODE_ID="${NODE_IDS[$i]}"
-  
-  # Перевірка наявності screen
+
+  # Ensure screen exists
   if ! command -v screen &>/dev/null; then
     echo -e "${RED}[!] screen is not installed. Please install screen manually.${NC}"
     exit 1
   fi
 
-  # Якщо сесія вже є, її потрібно завершити перед запуском нового
   screen -S "$SESSION_NAME" -X quit 2>/dev/null || true
-  
-  # Запуск вузла в сесії screen
+
   echo -e "${GREEN}[*] Launching node-id $NODE_ID in screen session '$SESSION_NAME'...${NC}"
-  screen -dmS "$SESSION_NAME" bash -c "cd $WORKDIR && nexus-network start --node-id $NODE_ID"
-  
-  # Перевірка, чи сесія запустилась
+  screen -dmS "$SESSION_NAME" bash -c "cd $WORKDIR && LD_LIBRARY_PATH=/opt/glibc-2.39/lib nexus-network start --node-id $NODE_ID"
+
   sleep 1
   if screen -list | grep -q "$SESSION_NAME"; then
     echo -e "${GREEN}[✓] node-id $NODE_ID running in '$SESSION_NAME'${NC}"
@@ -140,6 +132,7 @@ echo -e "[i] To reattach: screen -r nexus1 (or nexus2, etc.)"
 echo -e "[i] To stop: screen -XS nexusX quit"
 echo -e "[i] To cleanup: rm -rf $WORKDIR${NC}"
 
-# === Auto-start Nexus CLI ===
+# === Auto-start last entered node for log view ===
+NODE_ID="${NODE_IDS[0]}"
 echo -e "${GREEN}[*] Starting Nexus CLI with node-id $NODE_ID...${NC}"
-nexus-network start --node-id "$NODE_ID"
+LD_LIBRARY_PATH=/opt/glibc-2.39/lib nexus-network start --node-id "$NODE_ID"
