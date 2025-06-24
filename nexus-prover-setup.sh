@@ -20,21 +20,16 @@ echo -e "${YELLOW}=               CPI.TM                          =${NC}"
 echo -e "${GREEN}=             by billymoor                       =${NC}"
 echo -e "${YELLOW}==================================================${NC}\n"
 
-# === Check if /opt exists and create if missing ===
-if [ ! -d "/opt" ]; then
-  echo -e "${YELLOW}[!] /opt directory not found. Creating it...${NC}"
-  mkdir -p /opt
-  echo -e "${GREEN}[✓] /opt directory created successfully!${NC}"
-fi
-
 # === Check GLIBC version and install if missing ===
 REQUIRED_GLIBC_VERSION="2.39"
 INSTALL_GLIBC=false
+GLIBC_DIR="/opt/glibc-2.39"
 
-if [ -f "/opt/glibc-2.39/lib/libc.so.6" ]; then
-  INSTALLED_VERSION=$(/opt/glibc-2.39/lib/libc.so.6 | grep GLIBC | awk '{print $NF}' | sort -V | tail -n 1)
+# Check if GLIBC is installed at the correct location
+if [ -f "$GLIBC_DIR/lib/libc.so.6" ]; then
+  INSTALLED_VERSION=$($GLIBC_DIR/lib/libc.so.6 | grep GLIBC | awk '{print $NF}' | sort -V | tail -n 1)
   if [[ "$INSTALLED_VERSION" == "$REQUIRED_GLIBC_VERSION" ]]; then
-    echo -e "${GREEN}[✓] GLIBC $REQUIRED_GLIBC_VERSION already installed in /opt/glibc-2.39${NC}"
+    echo -e "${GREEN}[✓] GLIBC $REQUIRED_GLIBC_VERSION already installed in $GLIBC_DIR${NC}"
   else
     INSTALL_GLIBC=true
   fi
@@ -42,19 +37,23 @@ else
   INSTALL_GLIBC=true
 fi
 
+# Install GLIBC if necessary
 if [ "$INSTALL_GLIBC" = true ]; then
   echo -e "${RED}[!] GLIBC $REQUIRED_GLIBC_VERSION not found. Installing...${NC}"
+
+  # Download and install GLIBC 2.39
   wget http://ftp.gnu.org/gnu/libc/glibc-2.39.tar.gz
   tar -xvzf glibc-2.39.tar.gz
   cd glibc-2.39
   mkdir build && cd build
-  ../configure --prefix=/opt/glibc-2.39
+  ../configure --prefix=$GLIBC_DIR
   make -j$(nproc)
   make install
   cd ../.. && rm -rf glibc-2.39*
 
-  export LD_LIBRARY_PATH=/opt/glibc-2.39/lib:$LD_LIBRARY_PATH
-  echo "export LD_LIBRARY_PATH=/opt/glibc-2.39/lib:\$LD_LIBRARY_PATH" >> ~/.bashrc
+  # Set LD_LIBRARY_PATH environment variable
+  export LD_LIBRARY_PATH=$GLIBC_DIR/lib:$LD_LIBRARY_PATH
+  echo "export LD_LIBRARY_PATH=$GLIBC_DIR/lib:\$LD_LIBRARY_PATH" >> ~/.bashrc
   source ~/.bashrc
 
   echo -e "${GREEN}[✓] GLIBC $REQUIRED_GLIBC_VERSION installed successfully!${NC}"
@@ -131,7 +130,7 @@ for ((i=0;i<NODE_COUNT;i++)); do
   screen -S "$SESSION_NAME" -X quit 2>/dev/null || true
 
   echo -e "${GREEN}[*] Launching node-id $NODE_ID in screen session '$SESSION_NAME'...${NC}"
-  screen -dmS "$SESSION_NAME" bash -c "cd $WORKDIR && LD_LIBRARY_PATH=/opt/glibc-2.39/lib nexus-network start --node-id $NODE_ID"
+  screen -dmS "$SESSION_NAME" bash -c "cd $WORKDIR && LD_LIBRARY_PATH=$GLIBC_DIR/lib nexus-network start --node-id $NODE_ID"
 
   sleep 1
   if screen -list | grep -q "$SESSION_NAME"; then
@@ -150,4 +149,4 @@ echo -e "[i] To cleanup: rm -rf $WORKDIR${NC}"
 
 # === Auto-start Nexus CLI ===
 echo -e "${GREEN}[*] Starting Nexus CLI with node-id $NODE_ID...${NC}"
-LD_LIBRARY_PATH=/opt/glibc-2.39/lib nexus-network start --node-id "$NODE_ID"
+LD_LIBRARY_PATH=$GLIBC_DIR/lib nexus-network start --node-id "$NODE_ID"
