@@ -20,6 +20,34 @@ echo -e "${YELLOW}=               CPI.TM                          =${NC}"
 echo -e "${GREEN}=             by billymoor                       =${NC}"
 echo -e "${YELLOW}==================================================${NC}\n"
 
+# === Check GLIBC version and update if necessary ===
+REQUIRED_GLIBC_VERSION="2.39"
+CURRENT_GLIBC_VERSION=$(ldd --version | head -n 1 | awk '{print $NF}')
+
+if [[ "$(printf '%s\n' "$REQUIRED_GLIBC_VERSION" "$CURRENT_GLIBC_VERSION" | sort -V | head -n 1)" != "$REQUIRED_GLIBC_VERSION" ]]; then
+    echo -e "${RED}[!] Required GLIBC version is $REQUIRED_GLIBC_VERSION. Your version is $CURRENT_GLIBC_VERSION.${NC}"
+    echo -e "${YELLOW}[!] Proceeding with updating GLIBC to version $REQUIRED_GLIBC_VERSION.${NC}"
+
+    # Download and compile GLIBC 2.39
+    wget http://ftp.gnu.org/gnu/libc/glibc-2.39.tar.gz
+    tar -xvzf glibc-2.39.tar.gz
+    cd glibc-2.39
+    mkdir build
+    cd build
+    ../configure --prefix=/opt/glibc-2.39
+    make -j$(nproc)
+    sudo make install
+
+    # Update library path
+    export LD_LIBRARY_PATH=/opt/glibc-2.39/lib:$LD_LIBRARY_PATH
+    echo "export LD_LIBRARY_PATH=/opt/glibc-2.39/lib:$LD_LIBRARY_PATH" >> ~/.bashrc
+    source ~/.bashrc
+
+    echo -e "${GREEN}[✓] GLIBC updated successfully!${NC}"
+else
+    echo -e "${GREEN}[✓] GLIBC version is sufficient (${CURRENT_GLIBC_VERSION}).${NC}"
+fi
+
 # === Working directory ===
 WORKDIR="/root/nexus-prover"
 echo -e "${GREEN}[*] Working directory: $WORKDIR${NC}"
