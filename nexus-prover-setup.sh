@@ -51,12 +51,3 @@ docker-compose --version
 # Встановлюємо Screen
 echo "Встановлюємо Screen..."
 sudo apt install -y screen
-
-# Скачуємо образ
-echo "Скачуємо образ Docker..."
-docker pull nexusxyz/nexus-cli:latest
-
-# Створюємо сесію screen
-echo "Створюємо сесію screen..."
-echo "Встановлення завершено! Тепер ви в сесії screen із Nexus CLI."
-screen -S nexus3
