@@ -15,9 +15,9 @@ fi
 # === Welcome banner ===
 clear
 echo -e "${YELLOW}==================================================${NC}"
-echo -e "${GREEN}=       🚀 Nexus Multi-Node Setup              =${NC}"
+echo -e "${GREEN}=         🚀 Nexus Node Setup                    =${NC}"
 echo -e "${YELLOW}=               CPI.TM                          =${NC}"
-echo -e "${GREEN}=             by billymoor                          =${NC}"
+echo -e "${GREEN}=             by billymoor                       =${NC}"
 echo -e "${YELLOW}==================================================${NC}\n"
 
 # === Working directory ===
