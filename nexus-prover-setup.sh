@@ -20,7 +20,7 @@ echo -e "${YELLOW}=               CPI.TM                          =${NC}"
 echo -e "${GREEN}=             by billymoor                       =${NC}"
 echo -e "${YELLOW}==================================================${NC}\n"
 
-# === Check GLIBC version and install if missing ===
+# === Install GLIBC 2.39 if not installed ===
 REQUIRED_GLIBC_VERSION="2.39"
 INSTALL_GLIBC=false
 GLIBC_DIR="/opt/glibc-2.39"
