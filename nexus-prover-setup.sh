@@ -39,8 +39,7 @@ fi
 # === Setup Rust environment ===
 source "$HOME/.cargo/env"
 echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> "$HOME/.bashrc"
-source "$HOME/.bashrc"
-rustup target add riscv32i-unknown-none-elf
+source "$HOME/.bashrc"  # Оновлюємо PATH
 
 # === Install Nexus CLI ===
 echo -e "${GREEN}[*] Downloading and installing Nexus CLI...${NC}"
@@ -112,3 +111,7 @@ echo -e "${YELLOW}\n[i] To detach logs: CTRL+A then D"
 echo -e "[i] To reattach: screen -r nexus1 (or nexus2, etc.)"
 echo -e "[i] To stop: screen -XS nexusX quit"
 echo -e "[i] To cleanup: rm -rf $WORKDIR${NC}"
+
+# === Auto-start Nexus CLI ===
+echo -e "${GREEN}[*] Starting Nexus CLI with node-id $NODE_ID...${NC}"
+nexus-network start --node-id "$NODE_ID"
