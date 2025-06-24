@@ -20,6 +20,13 @@ echo -e "${YELLOW}=               CPI.TM                          =${NC}"
 echo -e "${GREEN}=             by billymoor                       =${NC}"
 echo -e "${YELLOW}==================================================${NC}\n"
 
+# === Check if /opt exists and create if missing ===
+if [ ! -d "/opt" ]; then
+  echo -e "${YELLOW}[!] /opt directory not found. Creating it...${NC}"
+  mkdir -p /opt
+  echo -e "${GREEN}[✓] /opt directory created successfully!${NC}"
+fi
+
 # === Check GLIBC version and install if missing ===
 REQUIRED_GLIBC_VERSION="2.39"
 INSTALL_GLIBC=false
